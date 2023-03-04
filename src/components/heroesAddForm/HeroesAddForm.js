@@ -1,21 +1,16 @@
-
-
-// Задача для этого компонента:
-// Реализовать создание нового героя с введенными данными. Он должен попадать
-// в общее состояние и отображаться в списке + фильтроваться
-// Уникальный идентификатор персонажа можно сгенерировать через uiid
-// Усложненная задача:
-// Персонаж создается и в файле json при помощи метода POST
-// Дополнительно:
-// Элементы <option></option> желательно сформировать на базе
-// данных из фильтров
-
 import { useState, useEffect } from 'react';
 import { useHttp } from '../../hooks/http.hook';
 import { useDispatch, useSelector } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
 
-import { heroesFetching, heroesFetched, heroesFetchingError } from '../../actions';
+import { 
+    heroesFetching, 
+    heroesFetched, 
+    heroesFetchingError,
+    filtersFetched,
+    filtersFetching,
+    filtersFetchingError
+ } from '../../actions';
 
 const HeroesAddForm = () => {
     const [newHeroe, setHeroe] = useState({
@@ -23,16 +18,17 @@ const HeroesAddForm = () => {
         description: '',
         element: '',
     });
-    const [filtersList, setFiltersList] = useState([]);
+    // const [filtersList, setFiltersList] = useState([]);
     
-    const { heroes } = useSelector(state => state);
+    const { heroes, filters } = useSelector(state => state);
     const dispatch = useDispatch();
     const { request } = useHttp();
 
     useEffect(() => {
+        dispatch(filtersFetching());
         request("http://localhost:3001/filters")
-            .then(data => setFiltersList(data));
-        
+            .then(data => dispatch(filtersFetched(data)))
+            .catch(() => dispatch(filtersFetchingError()))
         // eslint-disable-next-line
     }, [])
     
@@ -70,11 +66,14 @@ const HeroesAddForm = () => {
             element: '',
         });
     }
-
-    const listOptions = filtersList.filter(item => item !== 'all').map(item => {
-        return <option key={uuidv4()} value={item}>{item.slice(0, 1).toUpperCase() + item.slice(1)}</option>
-    })
-
+    
+    let listOptions = null;
+    if (Array.isArray(filters)) {
+        listOptions = filters.filter(item => item !== 'all').map(item => {
+            return <option key={uuidv4()} value={item}>{item.slice(0, 1).toUpperCase() + item.slice(1)}</option>
+        })
+    }
+    
     return (
         <form onSubmit={onSendingHeroe} className="border p-4 shadow-lg rounded">
             <div className="mb-3">
