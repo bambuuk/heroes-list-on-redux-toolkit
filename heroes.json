@@ -1,29 +1,29 @@
 {
-    "heroes": [
-        {
-            "id": 1,
-            "name": "Первый герой",
-            "description": "Первый герой в рейтинге!",
-            "element": "fire"
-        },
-        {
-            "id": 2,
-            "name": "Неизвестный герой",
-            "description": "Скрывающийся в тени",
-            "element": "wind"
-        },
-        {
-            "id": 3,
-            "name": "Морской герой",
-            "description": "Как аквамен, но не из DC",
-            "element": "water"
-        }
-    ],
-    "filters": [
-        "all",
-        "fire",
-        "water",
-        "wind",
-        "earth"
-    ]
+  "heroes": [
+    {
+      "name": "Harry",
+      "description": "He has a good team",
+      "element": "fire",
+      "id": "ukraine"
+    },
+    {
+      "name": "Albus",
+      "description": "He had a good team",
+      "element": "wind",
+      "id": "will"
+    },
+    {
+      "name": "Ron",
+      "description": "He is main of the team",
+      "element": "water",
+      "id": "victory"
+    }
+  ],
+  "filters": [
+    "all",
+    "fire",
+    "water",
+    "wind",
+    "earth"
+  ]
 }
