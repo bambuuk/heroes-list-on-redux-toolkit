@@ -7,8 +7,6 @@ const initialState = {
   activeFilter: 'all'
 }
 
-// в данном методе должны возвращать промис и обрабатывать его
-// в extraReducers метода createSlice
 export const fetchFilters = createAsyncThunk(
   'filters/fetchFilters',
   () => {
