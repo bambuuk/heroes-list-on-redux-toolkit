@@ -1,18 +1,18 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import classNames from 'classnames';
+import store from '../../store';
 
-import { fetchFilters } from './FiltersSlice';
-import { filtersActiveFilterChanged } from './FiltersSlice';
+import { filtersActiveFilterChanged, fetchFilters, selectAll } from './FiltersSlice';
 
 import Spinner from '../spinner/Spinner';
 
 const HeroesFilters = () => {
 
-    const { filters, filtersLoadingStatus, activeFilter } = useSelector(state => state.filters);
+    const { filtersLoadingStatus, activeFilter } = useSelector(state => state.filters);
+    const filters = selectAll(store.getState());
     const dispatch = useDispatch();
 
-    // Запрос на сервер для получения фильтров и последовательной смены состояния
     useEffect(() => {
         dispatch(fetchFilters());
         // eslint-disable-next-line
@@ -21,17 +21,17 @@ const HeroesFilters = () => {
     if (filtersLoadingStatus === "loading") {
         return <Spinner />;
     } else if (filtersLoadingStatus === "error") {
-        return <h5 className="text-center mt-5">Ошибка загрузки</h5>
+        return <h5 className="text-center mt-5">Loading error</h5>
     }
 
     const renderFilters = (arr) => {
         if (arr.length === 0) {
-            return <h5 className="text-center mt-5">Фильтры не найдены</h5>
+            return <h5 className="text-center mt-5">Filters not found</h5>
         }
 
         return arr.map(({ name, className, label }) => {
 
-            // Используем библиотеку classnames и формируем классы динамически
+            // Using the classnames library and generating classes dynamically
             const btnClass = classNames('btn', className, {
                 'active': name === activeFilter
             });
@@ -50,7 +50,7 @@ const HeroesFilters = () => {
     return (
         <div className="card shadow-lg mt-4">
             <div className="card-body">
-                <p className="card-text">Отфильтруйте героев по элементам</p>
+                <p className="card-text">Filter heroes by elements</p>
                 <div className="btn-group">
                     {elements}
                 </div>
