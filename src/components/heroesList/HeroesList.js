@@ -23,8 +23,8 @@ const HeroesList = () => {
         // eslint-disable-next-line
     }, []);
 
-    const onDelete = useCallback((id) => {
-        request(`http://localhost:3001/heroes/${id}`, "DELETE")
+    const onDelete = useCallback((id, index) => {
+        request(`https://640b3f4a65d3a01f981567a6.mockapi.io/heroes/${index+1}`, "DELETE")
             .then(data => console.log(data, 'Deleted'))
             .then(dispatch(heroDeleted(id)))
             .catch(err => console.log(err));
@@ -48,13 +48,13 @@ const HeroesList = () => {
             )
         }
 
-        return arr.map(({ id, ...props }) => {
+        return arr.map(({ id, ...props }, index) => {
             return (
                 <CSSTransition
                     key={id}
                     timeout={500}
                     classNames="hero">
-                    <HeroesListItem  {...props} onDelete={() => onDelete(id)} />
+                    <HeroesListItem  {...props} onDelete={() => onDelete(id, index)} />
                 </CSSTransition>
             )
         })
