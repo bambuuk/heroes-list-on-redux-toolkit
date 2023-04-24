@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/heroes-list-on-redux-toolkit/static/css/main.42fce5bc.css",
-    "main.js": "/heroes-list-on-redux-toolkit/static/js/main.a0628c04.js",
+    "main.js": "/heroes-list-on-redux-toolkit/static/js/main.c3f19aa9.js",
     "static/media/hero_bg.jpg": "/heroes-list-on-redux-toolkit/static/media/hero_bg.0540b794b0424b67d780.jpg",
     "index.html": "/heroes-list-on-redux-toolkit/index.html",
     "main.42fce5bc.css.map": "/heroes-list-on-redux-toolkit/static/css/main.42fce5bc.css.map",
-    "main.a0628c04.js.map": "/heroes-list-on-redux-toolkit/static/js/main.a0628c04.js.map"
+    "main.c3f19aa9.js.map": "/heroes-list-on-redux-toolkit/static/js/main.c3f19aa9.js.map"
   },
   "entrypoints": [
     "static/css/main.42fce5bc.css",
-    "static/js/main.a0628c04.js"
+    "static/js/main.c3f19aa9.js"
   ]
 }
