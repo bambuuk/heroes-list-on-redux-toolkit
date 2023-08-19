@@ -1,20 +1,24 @@
-import { configureStore } from '@reduxjs/toolkit';
-import heroes from '../components/heroesList/HeroesSlice';
-import filters from '../components/heroesFilters/FiltersSlice';
+import { configureStore } from "@reduxjs/toolkit";
+import filters from "../components/heroesFilters/FiltersSlice";
+import { apiSlice } from "../api/apiSlice";
 
 const stringMiddleware = () => (next) => (action) => {
-  if (typeof action === 'string') {
+  if (typeof action === "string") {
     return next({
-      type: action
+      type: action,
     });
   }
   return next(action);
-}
+};
 
 const store = configureStore({
-  reducer: { heroes, filters },
-  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(stringMiddleware),
-  devTools: process.env.NODE_ENV !== 'production',
-})
+  reducer: { 
+    filters, 
+    [apiSlice.reducerPath]: apiSlice.reducer 
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(stringMiddleware, apiSlice.middleware),
+  devTools: process.env.NODE_ENV !== "production",
+});
 
 export default store;

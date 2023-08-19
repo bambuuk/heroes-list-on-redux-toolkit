@@ -1,71 +1,62 @@
-import { useHttp } from '../../hooks/http.hook';
-import { useEffect, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import { useCallback, useMemo } from "react";
+import { useSelector } from "react-redux";
+import { CSSTransition, TransitionGroup } from "react-transition-group";
 
-import { heroDeleted, fetchHeroes, filteredHeroesSelector } from './HeroesSlice';
+import { useGetHeroesQuery, useDeleteHeroMutation } from "../../api/apiSlice";
 
 import HeroesListItem from "../heroesListItem/HeroesListItem";
-import Spinner from '../spinner/Spinner';
+import Spinner from "../spinner/Spinner";
 
-import './heroesList.scss';
+import "./heroesList.scss";
 
 const HeroesList = () => {
-    const filteredHeroes = useSelector(filteredHeroesSelector);
+  const { data: heroes = [], isLoading, isError } = useGetHeroesQuery();
 
-    const heroesLoadingStatus = useSelector(state => state.heroes.heroesLoadingStatus);
-    const dispatch = useDispatch();
-    const { request } = useHttp();
+  const [deleteHero] = useDeleteHeroMutation();
 
-    useEffect(() => {
-        dispatch(fetchHeroes());
+  const activeFilter = useSelector((state) => state.filters.activeFilter);
 
-        // eslint-disable-next-line
-    }, []);
+  const filteredHeroes = useMemo(() => {
+    const filteredHeroes = heroes.slice();
+    if (activeFilter === "all") {
+      return filteredHeroes;
+    } else {
+      return filteredHeroes.filter((item) => item.element === activeFilter);
+    }
+  }, [heroes, activeFilter]);
 
-    const onDelete = useCallback((id) => {
-        request(`https://640b3f4a65d3a01f981567a6.mockapi.io/heroes/${id}`, "DELETE")
-            .then(data => console.log(data, 'Deleted'))
-            .then(dispatch(heroDeleted(id)))
-            .catch(err => console.log(err));
-        // eslint-disable-next-line  
-    }, [request]);
+  const onDelete = useCallback(
+    (id) => {
+        deleteHero(id);
+    }, [deleteHero]
+  );
 
-    if (heroesLoadingStatus === "loading") {
-        return <Spinner />;
-    } else if (heroesLoadingStatus === "error") {
-        return <h5 className="text-center mt-5">Loading error</h5>
+  if (isLoading) {
+    return <Spinner />;
+  } else if (isError) {
+    return <h5 className="text-center mt-5">Loading error</h5>;
+  }
+
+  const renderHeroesList = (arr) => {
+    if (arr.length === 0) {
+      return (
+        <CSSTransition timeout={0} classNames="hero">
+          <h5 className="text-center mt-5">No heroes yet</h5>
+        </CSSTransition>
+      );
     }
 
-    const renderHeroesList = (arr) => {
-        if (arr.length === 0) {
-            return (
-                <CSSTransition
-                    timeout={0}
-                    classNames="hero">
-                    <h5 className="text-center mt-5">No heroes yet</h5>
-                </CSSTransition>
-            )
-        }
+    return arr.map(({ id, ...props }) => {
+      return (
+        <CSSTransition key={id} timeout={500} classNames="hero">
+          <HeroesListItem {...props} onDelete={() => onDelete(id)} />
+        </CSSTransition>
+      );
+    });
+  };
 
-        return arr.map(({ id, ...props }) => {
-            return (
-                <CSSTransition
-                    key={id}
-                    timeout={500}
-                    classNames="hero">
-                    <HeroesListItem  {...props} onDelete={() => onDelete(id)} />
-                </CSSTransition>
-            )
-        })
-    }
-
-    const elements = renderHeroesList(filteredHeroes);
-    return (
-        <TransitionGroup component="ul">
-            {elements}
-        </TransitionGroup>
-    )
-}
+  const elements = renderHeroesList(filteredHeroes);
+  return <TransitionGroup component="ul">{elements}</TransitionGroup>;
+};
 
 export default HeroesList;

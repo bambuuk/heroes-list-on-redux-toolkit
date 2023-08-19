@@ -1,10 +1,16 @@
-
-const Spinner = () => {
-    return (
-        <div className="spinner-border mx-auto mt-5" role="status">
-            <span className="visually-hidden">Loading...</span>
-        </div>
-    )
-}
+const Spinner = ({ mark }) => {
+  return (
+    <div
+      className={
+        mark === "addForm"
+          ? "spinner-border mx-auto"
+          : "spinner-border mx-auto mt-5"
+      }
+      role="status"
+    >
+      <span className="visually-hidden">Loading...</span>
+    </div>
+  );
+};
 
 export default Spinner;

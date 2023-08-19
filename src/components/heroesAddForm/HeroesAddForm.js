@@ -1,104 +1,122 @@
-import {useHttp} from '../../hooks/http.hook';
-import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { v4 as uuidv4 } from 'uuid';
-import store from '../../store';
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import { v4 as uuidv4 } from "uuid";
+import store from "../../store";
 
-import { heroCreated } from '../heroesList/HeroesSlice';
-import { selectAll } from '../heroesFilters/FiltersSlice';
+import { selectAll } from "../heroesFilters/FiltersSlice";
+import { useCreateHeroMutation } from "../../api/apiSlice";
+import Spinner from "../spinner/Spinner";
 
 const HeroesAddForm = () => {
-    const [heroName, setHeroName] = useState('');
-    const [heroDescr, setHeroDescr] = useState('');
-    const [heroElement, setHeroElement] = useState('');
+  const [heroName, setHeroName] = useState("");
+  const [heroDescr, setHeroDescr] = useState("");
+  const [heroElement, setHeroElement] = useState("");
 
-    const {filtersLoadingStatus} = useSelector(state => state.filters);
-    const filters = selectAll(store.getState());
-    const dispatch = useDispatch();
-    const {request} = useHttp();
+  // createHero - викликає мутацію
+  // в другом аргументі- це об'єкт з станами запиту
+  const [createHero, { isLoading }] = useCreateHeroMutation();
 
-    const onSubmitHandler = (e) => {
-        e.preventDefault();
+  const { filtersLoadingStatus } = useSelector((state) => state.filters);
+  const filters = selectAll(store.getState());
 
-        const newHero = {
-            id: uuidv4(),
-            name: heroName,
-            description: heroDescr,
-            element: heroElement
-        }
+  const onSubmitHandler = (e) => {
+    e.preventDefault();
 
-        request("https://640b3f4a65d3a01f981567a6.mockapi.io/heroes", "POST", JSON.stringify(newHero))
-            .then(res => console.log(res, 'Sending successful'))
-            .then(dispatch(heroCreated(newHero)))
-            .catch(err => console.log(err));
+    const newHero = {
+      id: uuidv4(),
+      name: heroName,
+      description: heroDescr,
+      element: heroElement,
+    };
 
-        setHeroName('');
-        setHeroDescr('');
-        setHeroElement('');
+    createHero(newHero).unwrap();
+
+    setHeroName("");
+    setHeroDescr("");
+    setHeroElement("");
+  };
+
+  const renderFilters = (filters, status) => {
+    if (status === "loading") {
+      return <option>Loading Items</option>;
+    } else if (status === "error") {
+      return <option>Loading error</option>;
     }
 
-    const renderFilters = (filters, status) => {
-        if (status === "loading") {
-            return <option>Loading Items</option>
-        } else if (status === "error") {
-            return <option>Loading error</option>
-        }
-        
-        if (filters && filters.length > 0 ) {
-            return filters.map(({name, label}) => {
-                // eslint-disable-next-line
-                if (name === 'all')  return;
+    if (filters && filters.length > 0) {
+      return filters.map(({ name, label }) => {
+        // eslint-disable-next-line
+        if (name === "all") return;
 
-                return <option key={name} value={name}>{label}</option>
-            })
-        }
+        return (
+          <option key={name} value={name}>
+            {label}
+          </option>
+        );
+      });
     }
+  };
 
-    return (
-        <form className="border p-4 shadow-lg rounded" onSubmit={onSubmitHandler}>
-            <div className="mb-3">
-                <label htmlFor="name" className="form-label fs-4">Name of the new hero</label>
-                <input 
-                    required
-                    type="text" 
-                    name="name" 
-                    className="form-control" 
-                    id="name" 
-                    placeholder="What is my name?"
-                    value={heroName}
-                    onChange={(e) => setHeroName(e.target.value)}/>
-            </div>
+  return (
+    <form className="border p-4 shadow-lg rounded" onSubmit={onSubmitHandler}>
+      <div className="mb-3">
+        <label htmlFor="name" className="form-label fs-4">
+          Name of the new hero
+        </label>
+        <input
+          required
+          type="text"
+          name="name"
+          className="form-control"
+          id="name"
+          placeholder="What is my name?"
+          value={heroName}
+          onChange={(e) => setHeroName(e.target.value)}
+        />
+      </div>
 
-            <div className="mb-3">
-                <label htmlFor="text" className="form-label fs-4">Description</label>
-                <textarea
-                    required
-                    name="text" 
-                    className="form-control" 
-                    id="text" 
-                    placeholder="What can I do?"
-                    style={{"height": '130px'}}
-                    value={heroDescr}
-                    onChange={(e) => setHeroDescr(e.target.value)}/>
-            </div>
+      <div className="mb-3">
+        <label htmlFor="text" className="form-label fs-4">
+          Description
+        </label>
+        <textarea
+          required
+          name="text"
+          className="form-control"
+          id="text"
+          placeholder="What can I do?"
+          style={{ height: "130px" }}
+          value={heroDescr}
+          onChange={(e) => setHeroDescr(e.target.value)}
+        />
+      </div>
 
-            <div className="mb-3">
-                <label htmlFor="element" className="form-label">Select hero element</label>
-                <select 
-                    required
-                    className="form-select" 
-                    id="element" 
-                    name="element"
-                    value={heroElement}
-                    onChange={(e) => setHeroElement(e.target.value)}>
-                    <option value="">I own the element...</option>
-                    {renderFilters(filters, filtersLoadingStatus)}
-                </select>
-            </div>
+      <div className="mb-3">
+        <label htmlFor="element" className="form-label">
+          Select hero element
+        </label>
+        <select
+          required
+          className="form-select"
+          id="element"
+          name="element"
+          value={heroElement}
+          onChange={(e) => setHeroElement(e.target.value)}
+        >
+          <option value="">I own the element...</option>
+          {renderFilters(filters, filtersLoadingStatus)}
+        </select>
+      </div>
 
-            <button type="submit" className="btn btn-primary">Create</button>
-        </form>
-    )
-}
+      <button
+        type="submit"
+        className="btn btn-primary"
+        disabled={isLoading ? true : false}
+      >
+        {isLoading ? <Spinner mark={"addForm"} /> : "Create"}
+      </button>
+    </form>
+  );
+};
 
 export default HeroesAddForm;
