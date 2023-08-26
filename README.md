@@ -8,8 +8,8 @@ This is CRUD SPA project - hero admin panel, made with functional components.
 - Delete hero position
 
 ## Tools:
-- SCSS
 - React
 - Redux toolkit
+- RTk-query
 - classnames (A simple JavaScript utility for conditionally joining classNames together)
 - uuid (create random id)
